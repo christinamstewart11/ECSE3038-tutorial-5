@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response 
 from pydantic import BaseModel
 from pymongo import MongoClient
 
@@ -38,3 +38,17 @@ def create_device(device: Device):
         raise HTTPException(status_code=409, detail="A device called " + device.name + " already exists")
     devices.insert_one(device.model_dump())
     return device
+
+# Task 4
+@app.put("/devices/{name}")
+def put_device(name: str, device: Device, response: Response):
+    new_state = device.model_dump()
+    new_state["name"] = name
+    result = devices.replace_one({"name": name}, new_state, upsert=True)
+    if result.upserted_id is not None:
+        response.status_code = 201
+    return new_state
+
+# 200, with GET /devices/attic should show room: "loft" instead of room: "attic"
+# 201 Created probe, GET /devices shows 6.
+# 200, stored name is attic. The URL identifies the resource & overwrites the body’s name.
