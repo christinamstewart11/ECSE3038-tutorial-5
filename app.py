@@ -18,4 +18,7 @@ class Device(BaseModel):
     temp: float
     online: bool
 
-# Your handlers go below this line.
+# Task 1
+@app.get("/devices")
+def get_devices():
+    return list(devices.find({}, {"_id": 0}))
