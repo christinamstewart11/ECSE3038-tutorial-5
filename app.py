@@ -52,3 +52,16 @@ def put_device(name: str, device: Device, response: Response):
 # 200, with GET /devices/attic should show room: "loft" instead of room: "attic"
 # 201 Created probe, GET /devices shows 6.
 # 200, stored name is attic. The URL identifies the resource & overwrites the body’s name.
+
+# Task 5
+@app.delete("/devices/{name}")
+def delete_device(name: str):
+    result = devices.delete_one({"name": name})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="No device called " + name)
+    return {"deleted": name}
+
+# 200 and {"deleted": "fridge"}, GET /devices shows no fridge in the list.
+# 404 and {"detail": "No device called fridge"} count stays the same when  delete again. 
+# 404 and {"detail": "No device called basement"}, with the count unchanged.
+# probe deleted, frifge restored 
